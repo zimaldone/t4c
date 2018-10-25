@@ -3,44 +3,55 @@
 q....
 """
 from __future__ import print_function, division
+import csv, sys, logging
+# from encoding import encoder_decoder
+from util import json_util, args_parser
+from validation import file_check
 
-import csv, sys, json
-from encoding import encoder_decoder
-from util.json_util import write_json_to_file
-import argparse
 
-def parse_cli():
-        """parse command line options"""
-        parser = argparse.ArgumentParser(description="best hotel: helps you to find tgheahsdghsjg")
-        parser.add_argument("-s", "--source-file", required=True, default='hotels.csv')
-        return parser.parse_args()
+# setup logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+                    , level=logging.INFO)
+LOGGER = logging.getLogger(__name__)
+
 
 def main():
-   args = parse_cli()
-   try:
-        ## TODO Check if file exists
-        ## TODO sort List
-        ## TODO unit test pytest)
-        ## TODO make sure it runs everywhere
-        ## TODO support yaml pyYaml
+    args = args_parser.parse_cli()
+    try:
+        # TODO make sure it runs everywhere
+        # TODO sort List
+        # TODO unit test pytest)
+        # TODO support yaml pyYaml
 
-        destination_json = 'hotel.json'
+        destination_json = args.destination_file
         source_file = args.source_file
-        my_hotels = []
-        with open(source_file, mode='r') as hotels_file:
+        if file_check.file_validation_read(source_file):
+            my_hotels = []
+            with open(source_file, mode='r') as hotels_file:
                 reader = csv.DictReader(hotels_file, delimiter=',')
-                print(reader.fieldnames)
+                # print(reader.fieldnames)
                 for row in reader:
-                        #print(row['name'], row['address'])
-                        #print(row)
-                        #print(dir(row))
-                        my_hotels.append(row)
-                        break
-        write_json_to_file(my_hotels,destination_json)
-        # https://docs.python.org/2/library/urlparse.html
-   except IOError as error:
+                    # print(row['name'], row['address'])
+                    # print(row)
+                    # print(dir(row))
+                    print (row)
+                    my_hotels.append(row)
+                    break
+            if file_check.is_current_dir_writeable():
+                if file_check.file_validation_read(destination_json):
+                    choice = raw_input('Do you want to overwrite the file? [Y|N]').lower()
+                    if choice == "n" or choice != "y":
+                        sys.exit()
+                    else:
+                        json_util.write_json_to_file(my_hotels, destination_json, "True")
+                else:
+                    print("Input File {} not found!!".format(source_file))
+            else:
+                print("ehy man... I cannot write in this Directory")
+    except IOError as error:
         print('error!!! -> {}'.format(error))
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
