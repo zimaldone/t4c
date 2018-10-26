@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 """
-q....
+Script to convert CSV input data in JSON
 """
 from __future__ import print_function, division
-import csv, sys, logging
+import csv
+import sys
+import logging
+from validation import fields_validation
 # from encoding import encoder_decoder
 from util import json_util, args_parser
 from validation import file_check
@@ -20,12 +23,16 @@ def main():
     try:
         # TODO make sure it runs everywhere
         # TODO sort List
-        # TODO unit test pytest)
+        # TODO unit test (pytest)
         # TODO support yaml pyYaml
 
         destination_json = args.destination_file
         source_file = args.source_file
-        if file_check.file_validation_read(source_file):
+        sort_field = args.sort_by_field
+
+        # file_check.delete_file(destination_json)
+        i = 0
+        if file_check.read_existing_file(source_file):
             my_hotels = []
             with open(source_file, mode='r') as hotels_file:
                 reader = csv.DictReader(hotels_file, delimiter=',')
@@ -34,20 +41,22 @@ def main():
                     # print(row['name'], row['address'])
                     # print(row)
                     # print(dir(row))
-                    print (row)
+                    # print (row)
                     my_hotels.append(row)
-                    break
+                    i += 1
+                    if i == 10:
+                        break
+
+                    # my_hotels.sort(fields_validation.field_exists_in_csv_fields(sort_field, reader.fieldnames))
+                    # for mh in my_hotels:
+                    #   print(mh)
+
             if file_check.is_current_dir_writeable():
-                if file_check.file_validation_read(destination_json):
-                    choice = raw_input('Do you want to overwrite the file? [Y|N]').lower()
-                    if choice == "n" or choice != "y":
-                        sys.exit()
-                    else:
-                        json_util.write_json_to_file(my_hotels, destination_json, "True")
-                else:
-                    print("Input File {} not found!!".format(source_file))
-            else:
-                print("ehy man... I cannot write in this Directory")
+                if file_check.write_existing_file(destination_json):
+                    json_util.write_json_to_file(my_hotels, destination_json, "False")
+
+        print('\n\n#############################################')
+        print("yI saved and validated for you {} hotels!!".format(i))
     except IOError as error:
         print('error!!! -> {}'.format(error))
         sys.exit(1)

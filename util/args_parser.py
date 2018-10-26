@@ -10,4 +10,5 @@ def parse_cli():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("-s", "--source-file", required=False, default='hotels.csv')
     parser.add_argument("-d", "--destination-file", required=False, default='hotels.json')
+    parser.add_argument("--sort-by-field", required=False, default='name')
     return parser.parse_args()

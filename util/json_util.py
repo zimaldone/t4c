@@ -15,6 +15,6 @@ def read_json_from_file(file, default=None):
         return default
 
 
-def write_json_to_file(data, file,sort_keys):
-    with open(file, 'w') as f:
-        json.dump(data, f, sort_keys=sort_keys, indent=4)
+def write_json_to_file(data, destination_file, sort_keys_in_json):
+    with open(destination_file, 'w') as f:
+        json.dump(data, f, sort_keys=sort_keys_in_json, indent=4, encoding='utf-8')
