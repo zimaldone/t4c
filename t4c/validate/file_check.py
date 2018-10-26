@@ -10,6 +10,7 @@ def read_existing_file(file_path):
 
 
 def write_existing_file(file_path):
+
     if os.path.isfile(file_path) and os.path.exists(file_path) and os.access(file_path, os.W_OK):
         choice = raw_input('\n\nDo you want to overwrite the file? [ Y | N ]').lower()
         if choice == "y" or choice == "yes":

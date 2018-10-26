@@ -1,4 +1,7 @@
 import argparse
+import os
+
+DATA_DIR = 'data'
 
 
 def parse_cli():
@@ -8,7 +11,9 @@ def parse_cli():
                                                  "\n\n-> Default Input file: hotels.csv"
                                                  "\n-> Default Output Json: hotels.json",
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("-s", "--source-file", required=False, default='hotels.csv')
-    parser.add_argument("-d", "--destination-file", required=False, default='hotels.json')
+    parser.add_argument("-s", "--source-file", required=False,
+                        default=os.path.join(os.getcwd(), DATA_DIR, "hotels.csv"))
+    parser.add_argument("-d", "--destination-file", required=False,
+                        default=os.path.join(os.getcwd(), DATA_DIR, 'hotels.json'))
     parser.add_argument("--sort-by-field", required=False, default='name')
     return parser.parse_args()
