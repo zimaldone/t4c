@@ -35,4 +35,5 @@ def is_current_dir_writeable():
 
 
 def delete_file(file_to_delete):
-    os.remove(file_to_delete)
+    if read_existing_file(file_to_delete):
+        os.remove(file_to_delete)

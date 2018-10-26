@@ -6,6 +6,7 @@ from __future__ import print_function, division
 import csv
 import sys
 import logging
+import operator
 from validation import fields_validation
 # from encoding import encoder_decoder
 from util import json_util, args_parser
@@ -22,7 +23,6 @@ def main():
     args = args_parser.parse_cli()
     try:
         # TODO make sure it runs everywhere
-        # TODO sort List
         # TODO unit test (pytest)
         # TODO support yaml pyYaml
 
@@ -30,7 +30,7 @@ def main():
         source_file = args.source_file
         sort_field = args.sort_by_field
 
-        # file_check.delete_file(destination_json)
+        file_check.delete_file(destination_json)
         i = 0
         if file_check.read_existing_file(source_file):
             my_hotels = []
@@ -38,25 +38,19 @@ def main():
                 reader = csv.DictReader(hotels_file, delimiter=',')
                 # print(reader.fieldnames)
                 for row in reader:
-                    # print(row['name'], row['address'])
-                    # print(row)
-                    # print(dir(row))
-                    # print (row)
                     my_hotels.append(row)
                     i += 1
                     if i == 10:
                         break
-
-                    # my_hotels.sort(fields_validation.field_exists_in_csv_fields(sort_field, reader.fieldnames))
-                    # for mh in my_hotels:
-                    #   print(mh)
+                    my_hotels.sort(key=operator.itemgetter(
+                        fields_validation.field_exists_in_csv_fields(sort_field, reader.fieldnames)))
 
             if file_check.is_current_dir_writeable():
                 if file_check.write_existing_file(destination_json):
-                    json_util.write_json_to_file(my_hotels, destination_json, "False")
+                    json_util.write_json_to_file(my_hotels, destination_json)
 
         print('\n\n#############################################')
-        print("yI saved and validated for you {} hotels!!".format(i))
+        print("I saved and validated for you {} hotels!!".format(i))
     except IOError as error:
         print('error!!! -> {}'.format(error))
         sys.exit(1)
