@@ -4,9 +4,9 @@ Script to convert CSV input data in JSON
 """
 from __future__ import print_function, division
 import sys
-import logging
 import operator
 from csv import DictReader
+import t4c.encoding
 from t4c.validate import fields_validation
 from t4c.validate import file_check
 from t4c.util import args_parser
@@ -19,10 +19,9 @@ from t4c.util import json_util
 # TODO support yaml pyYaml
 
 
-# setup logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-LOGGER = logging.getLogger(__name__)
+def utf_8_encoder(unicode_csv_data):
+    for line in unicode_csv_data:
+        yield line.encode('utf-8')
 
 
 def read_and_parse(source_file):
@@ -35,12 +34,11 @@ def read_and_parse(source_file):
     """
     try:
         with open(source_file, mode='r') as hotels_file:
-            reader = DictReader(hotels_file, delimiter=',')
+            reader = DictReader(utf_8_encoder(hotels_file), delimiter=',')
             return reader.fieldnames, data_parser(reader)
 
-    except IOError as e:
-        print ("I cannot read {} or it does not exists".format(source_file))
-        # raise HotelException(msg)
+    except IOError as ioe:
+        raise GeneratorExit("!!! - ooops  I cannot read {} or it does not exists".format(ioe.filename))
 
 
 def data_parser(data_read):
@@ -63,9 +61,7 @@ def write_data(data_parsed, destination_json, sort_by_field, fields_name):
 
     data_parsed.sort(key=operator.itemgetter(
                     fields_validation.field_exists_in_csv_fields(sort_by_field, fields_name)))
-
-    if file_check.write_existing_file(destination_json):
-        json_util.write_json_to_file(data_parsed, destination_json)
+    json_util.write_json_to_file(data_parsed, destination_json)
 
 
 def main():
@@ -87,5 +83,6 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except GeneratorExit:
+    except GeneratorExit as gex:
+        print(gex.message)
         sys.exit(1)

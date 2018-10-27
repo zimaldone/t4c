@@ -1,15 +1,9 @@
 import os
 
 
-def read_existing_file(file_path):
-        if os.path.isfile(file_path) and os.path.exists(file_path) and os.access(file_path, os.R_OK):
-            return True
-        else:
-            print("I cannot read {} or it does not exists".format(file_path))
-            return False
-
-
 def write_existing_file(file_path):
+
+    # TODO REFACTORING HERE TO RAISE RIGHT EXCEPTIONS
 
     if os.path.isfile(file_path) and os.path.exists(file_path) and os.access(file_path, os.W_OK):
         choice = raw_input('\n\nDo you want to overwrite the file? [ Y | N ]').lower()
@@ -36,5 +30,8 @@ def is_current_dir_writeable():
 
 
 def delete_file(file_to_delete):
-    if read_existing_file(file_to_delete):
+    try:
         os.remove(file_to_delete)
+    except (IOError, WindowsError) as ioe:
+        print ("Ooops - There has been an error deleting {}".format(ioe.filename))
+        pass
