@@ -1,5 +1,7 @@
 import argparse
 import os
+"""Parse command line options"""
+
 
 DATA_DIR = 'data'
 
