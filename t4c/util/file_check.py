@@ -1,5 +1,7 @@
 import os
 
+DATA_DIR = 'data'
+
 
 def write_existing_file(file_path):
 
@@ -27,6 +29,12 @@ def is_current_dir_writeable():
         return False
     else:
         return True
+
+
+def get_invalid_hotels_file():
+    data_dir = os.path.join(os.getcwd(), DATA_DIR)
+    if os.access(data_dir, os.W_OK):
+        return os.path.join(data_dir, "invalid_hotels.json")
 
 
 def delete_file(file_to_delete):
