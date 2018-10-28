@@ -5,23 +5,22 @@ Script to convert CSV input data in JSON
 from __future__ import print_function, division
 import sys
 import operator
-from csv import DictReader
-import t4c.encoding
+import csv
+
 from t4c.validate import fields_validation
 from t4c.validate import file_check
 from t4c.util import args_parser
 from t4c.util import json_util
 
-# TODO UNICODE / UTF-8 issue
+# TODO h name may only contain UTF-8 characters.
 # TODO validate url
+# TODO h ratings are given as a number from 0 to 5 stars.
+# TODO There may be no negative numbers.
+# TODO fix sort issue. Don't use "name" as default
+# ---
 # TODO make sure it runs everywhere
 # TODO unit test (pytest)
 # TODO support yaml pyYaml
-
-
-def utf_8_encoder(unicode_csv_data):
-    for line in unicode_csv_data:
-        yield line.encode('utf-8')
 
 
 def read_and_parse(source_file):
@@ -34,26 +33,29 @@ def read_and_parse(source_file):
     """
     try:
         with open(source_file, mode='r') as hotels_file:
-            reader = DictReader(utf_8_encoder(hotels_file), delimiter=',')
-            return reader.fieldnames, data_parser(reader)
+            reader = csv.DictReader(hotels_file, delimiter=',')
+            data = []
+            for row in reader:
+                data.append({key: value for (key, value) in row.items()})
+                if len(data) >= 4:
+                    break
 
+            return reader.fieldnames, data
     except IOError as ioe:
         raise GeneratorExit("!!! - ooops  I cannot read {} or it does not exists".format(ioe.filename))
 
 
-def data_parser(data_read):
-    """
-    takes `reader` and returns a list of valid item
-    """
-    data = []
-    for row in data_read:
-        # if valid(row):
-        data.append(row)
-
-        # for testing...
-        if len(data) >= 10:
-            break
-    return data
+# def data_validator(data_read):
+#     """
+#     takes `reader` and returns a list of valid item
+#     """
+#     data = []
+#     for row in data_read:
+#         data.append(unicode(cell, 'utf-8') for cell in row)
+#         # for testing...
+#         if len(data) >= 5:
+#             break
+#     return data
 
 
 def write_data(data_parsed, destination_json, sort_by_field, fields_name):
