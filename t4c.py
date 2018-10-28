@@ -54,7 +54,7 @@ def validate_data(current_row, complex_url_validation):
     try:
         current_row['name'] = current_row['name']
         current_row['address'] = current_row['address']
-        current_row['stars'] = validate.stars_validation(current_row['stars'])
+        current_row['stars'] = validate.rating_validation(current_row['stars'])
         current_row['contact'] = current_row['contact']
         current_row['phone'] = current_row['phone']
         current_row['uri'] = validate.url_validation(current_row['uri'], complex_url_validation)
