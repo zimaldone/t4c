@@ -1,13 +1,13 @@
-import validators
 import socket
-import tldextract
 import time
 import logging
 import timeit
+import validators
+import tldextract
 import t4c.t4c_exceptions as t4c_ex
 
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def field_exists_in_csv_fields(single_field, list_fields):
@@ -42,7 +42,7 @@ def url_validation(hotel_uri, complex_validation):
                 .format(hotel_uri, timeit.default_timer() - t1)
         raise t4c_ex.UriValidationError(ex.message)
 
-    logger.debug("url_validation performance {}".format(timeit.default_timer() - t1))
+    LOGGER.debug("url_validation performance {}".format(timeit.default_timer() - t1))
     return hotel_uri
 
 
@@ -56,7 +56,7 @@ def url_complex_validation(hotel_uri):
 
 
 def cast_str_2_boolean_argument(arg):
-    if type(arg) is not bool:
+    if not isinstance(arg, bool):
         if arg.lower() == 'false' or arg.lower() == 'f':
             return False
         elif arg.lower() == 'true' or arg.lower() == 't':

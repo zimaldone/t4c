@@ -5,6 +5,17 @@
     - source CSV file must be placed inside "./data" folder
     - the output is also saved in "./data" and contains max 2 files (one with export, the other with errors)
     - this
+    - The **URL validation**, as explained in the related cli argument, is syntactical and enabling the feature can be also slightly more sophisticated using DNS lookup of the TLD. Some other improvements:
+        - Check for HTTPS only site, excluding "unsecured" sites
+        - Perform a call for each fo them, checking if a HTTP 200 or HTTP 301/2 is returned. In case of 4xx and 5xx the sites would be filtered out.
+    - UTF-8 check is performed now for Hotels names, replacing invalid characters with UTF-8 map.
+        - The requirement is quite vague since the input file is already an UTF-8 encoded file. CSV reader converts not ASCII (eg: Latin Supplement & Extended) in related byte representation
+        the small method takes care of the re-encoding of these bytes in the str.
+        Same validation can be extended to address field.
+        
+    
+    
+
 - ###### The script accepts multiple arguments but none of them is mandatory:
     - **--source-file** : obviously the CSV file used as input
         - Default: ./data/hotels.csv
@@ -40,7 +51,7 @@ In order to run it please make sure that all dependencies are installed.
 
 **Note**: in a vanilla MacBook I slightly struggled because not even *pip* was installed and some SSL TLS 1.0 error were thrown.
 Depending on the OS you´re running, make sure that at least is installed:
-#### MacOS Sierra (10.12.6)
+### MacOS Sierra (10.12.6)
 ````
 $> curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 $> sudo python get-pip.py
@@ -102,7 +113,7 @@ admin@myhost:~/t4c-master$python t4c.py
 
 ````
 
-#### Windows 10
+### Windows 10
 
 First of all install Python 2.7 downloading the package from
 https://www.python.org/downloads/release/python-2715/ (currently latest version)

@@ -3,7 +3,7 @@ import logging
 
 DATA_DIR = 'data'
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class NoOverwriteError(GeneratorExit):
@@ -21,10 +21,7 @@ def write_existing_file(overwrite_destination, filename):
 
 def is_current_dir_writeable():
     if not os.access(os.pardir, os.W_OK):
-        print("ehy man... I cannot write in this Directory")
         return False
-    else:
-        return True
 
 
 def get_invalid_hotels_file():
@@ -41,5 +38,4 @@ def delete_file(file_to_delete):
     try:
         os.remove(file_to_delete)
     except (IOError, WindowsError) as ioe:
-        print ("Ooops - There has been an error deleting {}".format(ioe.filename))
-        pass
+        print("Ooops - There has been an error deleting {} ".format(ioe.filename))
