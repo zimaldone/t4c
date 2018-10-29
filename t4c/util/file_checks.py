@@ -12,10 +12,11 @@ class NoOverwriteError(GeneratorExit):
 
 def write_existing_file(overwrite_destination, filename):
 
-    if os.path.isfile(filename) and os.path.exists(filename) and overwrite_destination:
-        return
-    else:
-        raise NoOverwriteError("File {} won't be overwritten".format(filename))
+    if os.path.isfile(filename) and os.path.exists(filename):
+        if overwrite_destination:
+            return
+        else:
+            raise NoOverwriteError("File {} won't be overwritten".format(filename))
 
 
 def is_current_dir_writeable():

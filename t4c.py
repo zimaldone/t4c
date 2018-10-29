@@ -22,6 +22,11 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 logger = logging.getLogger(__name__)
 
 
+def utf_8_encoder(unicode_csv_data):
+    for line in unicode_csv_data:
+        yield line.encode('utf-8')
+
+
 def read_and_parse(source_file, complex_url_validation):
     """
     Reads source `filename` and returns a tuple with 2 elements
@@ -39,8 +44,9 @@ def read_and_parse(source_file, complex_url_validation):
                     logger.debug(str(len(data)) + ' - ' + row['name'] + ' - ' + row['uri'])
                     data.append(validate_data(row, complex_url_validation))
                     # for test
-                    if len(data) >= 65:
-                        break
+                    # if len(data) >= 100:
+                    #   break
+
                 except t4c_ex.GenericT4cError as ex:
                     not_valid.append(row)
             return reader.fieldnames, data, not_valid
@@ -79,10 +85,11 @@ def main():
     overwrite_destination = validate.cast_str_2_boolean_argument(args.overwrite_destination_file)
     complex_url_validation = validate.cast_str_2_boolean_argument(args.complex_url_validation)
 
-    for arg in vars(args):
-        logger.info("Starting with parameters: {} - {}".format(arg, getattr(args, arg)))
+    if logger.level == logging.DEBUG:
+        for arg in vars(args):
+            logger.info("Starting with parameters: {} - {}".format(arg, getattr(args, arg)))
+            logger.info("\n################################\n")
 
-    logger.info("\n################################\n")
     util.write_existing_file(overwrite_destination, destination_json)
 
     st1 = timeit.default_timer()

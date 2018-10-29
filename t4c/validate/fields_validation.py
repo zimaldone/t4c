@@ -29,28 +29,30 @@ def url_validation(hotel_uri, complex_validation):
     """ check if syntactically the URL is valid.
         if the "complex validation" is enabled it checks
         if the Top Level Domain (TLD) is resolvable """
+    t1 = timeit.default_timer()
     try:
         if validators.url(hotel_uri):
             if complex_validation:
-                return url_complex_validation(hotel_uri)
+                url_complex_validation(hotel_uri)
         else:
             raise t4c_ex.UriValidationError("The URL {} is not a valid one".format(hotel_uri))
-
     except (t4c_ex.UriValidationError, socket.gaierror) as ex:
+        if type(ex).__name__ == 'gaierror':
+            ex.message = "The address for {} cannot be resolved - Time spent {}"\
+                .format(hotel_uri, timeit.default_timer() - t1)
         raise t4c_ex.UriValidationError(ex.message)
+
+    logger.debug("url_validation performance {}".format(timeit.default_timer() - t1))
+    return hotel_uri
 
 
 def url_complex_validation(hotel_uri):
-
     domain = tldextract.extract(hotel_uri).registered_domain
-    t1 = timeit.default_timer
+    socket.setdefaulttimeout(3)
     ip_resolved = socket.gethostbyname(domain)
-    t2 = timeit.default_timer()
-    logger.debug("Time spent to perform look-up {}".format(t2-t1))
-
-    time.sleep(0.1)   # to avoid the hammering of DNS service
+    time.sleep(0.05)   # to avoid the hammering of DNS service
     if validators.ip_address.ipv4(ip_resolved) or validators.ip_address.ipv6(ip_resolved):
-        return hotel_uri
+        return
 
 
 def cast_str_2_boolean_argument(arg):

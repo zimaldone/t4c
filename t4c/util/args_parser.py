@@ -25,6 +25,7 @@ def parse_cli():
 
     parser.add_argument("--complex-url-validation", required=False, default=False, choices=['True', 'False'],
                         help='Default = False - '
-                             'It uses additional logic to evaluate the URL passed')
+                             'It uses additional logic to evaluate the URL passed\n'
+                             'WARNING - It slows down drastically script performance')
 
     return parser.parse_args()
