@@ -56,6 +56,52 @@ $> sudo pip install -r requirements.txt
 ````
 When the script finish to install the required modules, you are ready to successfully run the script!
 
+### Linux Debian Stable
+
+with Debian 9.5 Stretch **Python 2.7.13 (default, Nov 24 2017, 17:33:09)** is already installed however **pip** is missed.
+Let's install it
+
+````
+admin@myhost:~/t4c-master$ sudo easy_install pip
+
+[...]
+Installing pip script to /usr/local/bin
+Installing pip2.7 script to /usr/local/bin
+Installing pip2 script to /usr/local/bin
+
+Installed /usr/local/lib/python2.7/dist-packages/pip-18.1-py2.7.egg
+Processing dependencies for pip
+Finished processing dependencies for pip
+
+$> pip -V
+pip 18.1 from /usr/local/lib/python2.7/dist-packages/pip-18.1-py2.7.egg/pip (python 2.7)
+````
+Time now to install the required modules (assuiming you have already *t4c* folder in place and you are in
+````
+admin@myhost:~/t4c-master$ sudo pip install -r requirements.txt
+
+Collecting validators (from -r requirements.txt (line 1))
+  Downloading https://files.pythonhosted.org/packages/45/7b/5b7b74208a3e0744d1a0efbfb1935fa46fa4cfe58d3d63f17c49c58c429c/validators-0.12.2.tar.gz
+Collecting tldextract (from -r requirements.txt (line 2))
+  Downloading https://files.pythonhosted.org/packages/0e/0c/1b7332684dfc2e6311d59cd00859a5318a7e0ba50334ad217ceb9555e213/tldextract-2.2.0-py2.py3-none-any.whl (52kB)
+    100% |████████████████████████████████| 61kB 4.0MB/s 
+    
+ [....]
+````
+
+Ready to run the script now!!
+
+````
+admin@myhost:~/t4c-master$python t4c.py
+
+#############################################
+2018-10-29 17:35:37,685 - INFO - I saved and validated 3999 hotels in 0.871470928192 seconds
+2018-10-29 17:35:37,685 - INFO - Unfortunately 1 hotels did not pass the validation
+2018-10-29 17:35:37,685 - INFO - You can find all the generated data inside /home/admin/t4c-master/data
+2018-10-29 17:35:37,686 - INFO - Overall script took: 0.874050855637 seconds
+
+````
+
 #### Windows 10
 
 First of all install Python 2.7 downloading the package from
@@ -72,11 +118,5 @@ You can now open the command line (better as Administrator) and install the depe
 $> pip install -r requirements.txt
 ````
 
-here you go again... script is ready to be run.
-
-### Linux Debian Stable
-
-with Debian 9.5 Stretch python
-
-
+here you go again... script is ready to be run as in the Mac and Debian instructions
 
