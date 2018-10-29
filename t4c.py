@@ -15,9 +15,9 @@ import t4c.util as util
 # ---
 # TODO make sure it runs everywhere
 # TODO unit test (pytest)
-# TODO support yaml pyYaml
+# TODO support yaml - pyYaml
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
