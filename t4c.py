@@ -8,6 +8,7 @@ import operator
 import csv
 import logging
 import timeit
+import t4c.t4c_exceptions as t4c_ex
 import t4c.validate as validate
 import t4c.util as util
 
@@ -40,7 +41,7 @@ def read_and_parse(source_file, complex_url_validation):
                     # for test
                     if len(data) >= 65:
                         break
-                except (StopIteration, BaseException) as ex:
+                except t4c_ex.GenericT4cError as ex:
                     not_valid.append(row)
             return reader.fieldnames, data, not_valid
     except IOError as ioe:
@@ -51,16 +52,16 @@ def validate_data(current_row, complex_url_validation):
     """ this function is currently quite 'dumb'
         using hard-coded values and triggering the right validation """
     try:
-        current_row['name'] = current_row['name']
+        current_row['name'] = util.is_a_utf8_string(current_row['name'])
         current_row['address'] = current_row['address']
         current_row['stars'] = validate.rating_validation(current_row['stars'])
         current_row['contact'] = current_row['contact']
         current_row['phone'] = current_row['phone']
         current_row['uri'] = validate.url_validation(current_row['uri'], complex_url_validation)
         return current_row
-    except (validate.StarsValidationError, validate.UriValidationError) as si:
+    except (t4c_ex.StarsValidationError, t4c_ex.UriValidationError, t4c_ex.NotUTF8Error) as si:
         logger.error(si.message)
-        raise StopIteration
+        raise t4c_ex.GenericT4cError
 
 
 def write_data(data_parsed, destination_json, sort_by_field, fields_name):

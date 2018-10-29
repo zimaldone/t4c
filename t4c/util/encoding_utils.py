@@ -1,13 +1,10 @@
+import t4c.t4c_exceptions as tc4_ex
 
 
 def is_a_utf8_string(input_str):
-    valid_utf8 = ''
     try:
         input_str.decode('utf-8')
         print("Unicode {} and UTF-8 string len is {}".format(unicode(input_str), len(input_str)))
-        valid_utf8 = True
+        return input_str
     except UnicodeDecodeError:
-        print("Unicode {} and UTF-8 string len is {}".format(unicode(input_str), len(input_str)))
-        valid_utf8 = False
-    finally:
-        return valid_utf8
+        raise tc4_ex.NotUTF8Error("Unicode {} and UTF-8 string len is {}".format(unicode(input_str), len(input_str)))

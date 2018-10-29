@@ -4,16 +4,10 @@ import tldextract
 import time
 import logging
 import timeit
+import t4c.t4c_exceptions as t4c_ex
 
 
 logger = logging.getLogger(__name__)
-
-class StarsValidationError(StopIteration):
-    pass
-
-
-class UriValidationError(StopIteration):
-    pass
 
 
 def field_exists_in_csv_fields(single_field, list_fields):
@@ -28,7 +22,7 @@ def rating_validation(hotel_stars):
     if validators.between(hotel_stars, 0, 5):
         return hotel_stars
     else:
-        raise StarsValidationError("Stars {} is not valid".format(hotel_stars))
+        raise t4c_ex.StarsValidationError("Stars {} is not valid".format(hotel_stars))
 
 
 def url_validation(hotel_uri, complex_validation):
@@ -40,10 +34,10 @@ def url_validation(hotel_uri, complex_validation):
             if complex_validation:
                 return url_complex_validation(hotel_uri)
         else:
-            raise UriValidationError("The URL {} is not a valid one".format(hotel_uri))
+            raise t4c_ex.UriValidationError("The URL {} is not a valid one".format(hotel_uri))
 
-    except (UriValidationError, socket.gaierror) as ex:
-        raise UriValidationError(ex.message)
+    except (t4c_ex.UriValidationError, socket.gaierror) as ex:
+        raise t4c_ex.UriValidationError(ex.message)
 
 
 def url_complex_validation(hotel_uri):
@@ -69,6 +63,3 @@ def cast_str_2_boolean_argument(arg):
             raise RuntimeError("Invalid argument")
     else:
         return arg
-
-# if not util.is_a_utf8_string(row['name']):
-#     print('NO UTF8 STRING!!! {}'.format(row['name']))
