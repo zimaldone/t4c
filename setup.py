@@ -1,20 +1,25 @@
 from setuptools import setup, find_packages
 
+install_requires = [
+    'validators>=0.12.2',
+    'tldextract>=2.2.0',
+]
+
 setup(
     name="t4c",
     version="0.1",
-    packages=find_packages(
+    packages=find_packages('.',
         exclude=[
+            "test",
+            "tests.*"
             ".eggs",
             ".tox",
         ]
     ),
-    setup_requires=["pytest-runner"],
-    tests_require=[
-        "pytest-runner",
-        "pytest",
-        "pytest-cov",
-        "pytest-flakes",
-        "pytest-testdox",
-        "coverage"]
+    platforms='any',
+    install_requires=install_requires,
+    build_requires=install_requires,
+    classifiers=[
+        'Programming Language :: Python :: 2.7',
+    ]
 )

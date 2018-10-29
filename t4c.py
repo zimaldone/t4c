@@ -12,7 +12,6 @@ import t4c.t4c_exceptions as t4c_ex
 import t4c.validate as validate
 import t4c.util as util
 
-# TODO h name may only contain UTF-8 characters.
 # ---
 # TODO make sure it runs everywhere
 # TODO unit test (pytest)
