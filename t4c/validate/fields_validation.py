@@ -2,7 +2,11 @@ import validators
 import socket
 import tldextract
 import time
+import logging
+import timeit
 
+
+logger = logging.getLogger(__name__)
 
 class StarsValidationError(StopIteration):
     pass
@@ -20,7 +24,6 @@ def field_exists_in_csv_fields(single_field, list_fields):
 
 def rating_validation(hotel_stars):
     """check if stars are in valid range"""
-
     hotel_stars = int(hotel_stars)
     if validators.between(hotel_stars, 0, 5):
         return hotel_stars
@@ -40,17 +43,32 @@ def url_validation(hotel_uri, complex_validation):
             raise UriValidationError("The URL {} is not a valid one".format(hotel_uri))
 
     except (UriValidationError, socket.gaierror) as ex:
-        # print("An exception of type {0} occurred. Arguments:\n{1!r}".format(type(ex).__name__, ex.args))
         raise UriValidationError(ex.message)
 
 
 def url_complex_validation(hotel_uri):
+
     domain = tldextract.extract(hotel_uri).registered_domain
+    t1 = timeit.default_timer
     ip_resolved = socket.gethostbyname(domain)
-    time.sleep(0.1)
+    t2 = timeit.default_timer()
+    logger.debug("Time spent to perform look-up {}".format(t2-t1))
+
+    time.sleep(0.1)   # to avoid the hammering of DNS service
     if validators.ip_address.ipv4(ip_resolved) or validators.ip_address.ipv6(ip_resolved):
         return hotel_uri
 
+
+def cast_str_2_boolean_argument(arg):
+    if type(arg) is not bool:
+        if arg.lower() == 'false' or arg.lower() == 'f':
+            return False
+        elif arg.lower() == 'true' or arg.lower() == 't':
+            return True
+        else:
+            raise RuntimeError("Invalid argument")
+    else:
+        return arg
 
 # if not util.is_a_utf8_string(row['name']):
 #     print('NO UTF8 STRING!!! {}'.format(row['name']))

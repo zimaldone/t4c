@@ -6,6 +6,8 @@ from __future__ import print_function, division
 import sys
 import operator
 import csv
+import logging
+import timeit
 import t4c.validate as validate
 import t4c.util as util
 
@@ -15,13 +17,15 @@ import t4c.util as util
 # TODO unit test (pytest)
 # TODO support yaml pyYaml
 
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 def read_and_parse(source_file, complex_url_validation):
     """
     Reads source `filename` and returns a tuple with 2 elements
     0 - list with CSV Fields names
     1 - List of Dicts with all the row-elements
-
     It raises IOError exception `filename` cannot be read
     """
     try:
@@ -31,26 +35,21 @@ def read_and_parse(source_file, complex_url_validation):
             not_valid = []
             for row in reader:
                 try:
-                    print(str(len(data)) + ' - ' + row['name'] + ' - ' + row['uri'])
+                    logger.debug(str(len(data)) + ' - ' + row['name'] + ' - ' + row['uri'])
                     data.append(validate_data(row, complex_url_validation))
-
                     # for test
-                    if len(data) >= 20:
+                    if len(data) >= 65:
                         break
-
                 except (StopIteration, BaseException) as ex:
                     not_valid.append(row)
-
             return reader.fieldnames, data, not_valid
-
     except IOError as ioe:
-        raise GeneratorExit("!!! - ooops  I cannot read {} or it does not exists".format(ioe.filename))
+        raise IOError("!!! - ooops  I cannot read {} or it does not exists".format(ioe.filename))
 
 
 def validate_data(current_row, complex_url_validation):
     """ this function is currently quite 'dumb'
         using hard-coded values and triggering the right validation """
-
     try:
         current_row['name'] = current_row['name']
         current_row['address'] = current_row['address']
@@ -60,7 +59,7 @@ def validate_data(current_row, complex_url_validation):
         current_row['uri'] = validate.url_validation(current_row['uri'], complex_url_validation)
         return current_row
     except (validate.StarsValidationError, validate.UriValidationError) as si:
-        print(si.message)
+        logger.error(si.message)
         raise StopIteration
 
 
@@ -73,33 +72,44 @@ def write_data(data_parsed, destination_json, sort_by_field, fields_name):
 def main():
     args = util.args_parser.parse_cli()
     destination_json = args.destination_file
-    failed_validation_file = util.file_check.get_invalid_hotels_file()
+    failed_validation_file = util.file_checks.get_invalid_hotels_file()
     source_file = args.source_file
     sort_by_field = str(args.sort_by_field)
-    complex_url_validation = args.complex_url_validation
+    overwrite_destination = validate.cast_str_2_boolean_argument(args.overwrite_destination_file)
+    complex_url_validation = validate.cast_str_2_boolean_argument(args.complex_url_validation)
 
-    # For test
-    util.delete_file(destination_json)
+    for arg in vars(args):
+        logger.info("Starting with parameters: {} - {}".format(arg, getattr(args, arg)))
 
+    logger.info("\n################################\n")
+    util.write_existing_file(overwrite_destination, destination_json)
+
+    st1 = timeit.default_timer()
     # let's crack this down :)
     data_read_and_parsed = read_and_parse(source_file, complex_url_validation)
-
     fields_name = data_read_and_parsed[0]
     data_processed = data_read_and_parsed[1]
     data_failed_validation = data_read_and_parsed[2]
 
     # Finally Write data
     write_data(data_processed, destination_json, sort_by_field, fields_name)
+    # for the time being to make it simple, Always overwrite invalid hotels' file
     write_data(data_failed_validation,failed_validation_file, sort_by_field, fields_name)
 
-    print('\n\n#############################################')
-    print("I saved and validated for you {} hotels!!".format(len(data_read_and_parsed[1])))
-    print("Unfortunately {} hotels did not pass the validation".format(len(data_failed_validation)))
+    st2 = timeit.default_timer()
+
+    logger.info('\n\n#############################################')
+    logger.info("I saved and validated {} hotels in {} seconds".format(len(data_read_and_parsed[1]), st2-st1))
+    logger.info("Unfortunately {} hotels did not pass the validation".format(len(data_failed_validation)))
+    logger.info("You can find all the generated data inside {}".format(util.get_data_folder()))
 
 
 if __name__ == '__main__':
     try:
+        t1 = timeit.default_timer()
         main()
-    except GeneratorExit as gex:
-        print(gex.message)
+        t2 = timeit.default_timer()
+        logger.info("Overall script took: {} seconds".format(t2-t1))
+    except (GeneratorExit, IOError, RuntimeError) as error:
+        print(error)
         sys.exit(1)
